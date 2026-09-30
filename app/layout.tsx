@@ -10,13 +10,13 @@ const geistSans = Geist({
 
 export const metadata: Metadata = {
   title: "Recipe Finder",
-  description: "Tell me what's in your fridge and I'll suggest a recipe.",
+  description: "Dimmi cosa c'è nel tuo frigorifero e ti suggerirò una ricetta.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
-      lang="en"
+      lang="it"
       className={`${geistSans.variable} h-full antialiased`}
     >
       <body className="min-h-full font-sans">{children}</body>

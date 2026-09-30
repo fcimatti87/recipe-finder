@@ -9,7 +9,7 @@ export default function Home() {
         Recipe Finder
       </h1>
       <p className="text-zinc-600 mt-2">
-        Tell me what's in your fridge and I'll suggest a recipe.
+        Dimmi cosa c'è nel tuo frigorifero e ti suggerirò una ricetta.
       </p>
     </main>
   );
