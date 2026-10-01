@@ -2,6 +2,8 @@
 // - titolo
 // - il form (componente client a parte)
 
+import RecipeForm from '@/app/ui/forms';
+
 export default function Home() {
   return (
     <main className="mx-auto max-w-2xl px-4 py-8">
@@ -11,6 +13,7 @@ export default function Home() {
       <p className="text-zinc-600 mt-2">
         Dimmi cosa c'è nel tuo frigorifero e ti suggerirò una ricetta.
       </p>
+      <RecipeForm/>
     </main>
   );
 }

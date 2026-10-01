@@ -1,7 +1,7 @@
 // library to check the data at runtime
 import { z } from 'zod';
 
-export const MealTypeSchema = z.enum(['antipasto', 'primo', 'secondo', 'contorno', 'piatto unico', 'dolce']);
+export const MealTypeSchema = z.enum(['antipasto', 'primo', 'secondo', 'contorno', 'piatto_unico', 'dolce']);
 
 // define a schema to validate what the user submits through the form.
 export const RecipeRequestSchema = z.object({
