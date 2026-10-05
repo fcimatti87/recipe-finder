@@ -1,23 +1,24 @@
 // Server Actions
 'use server';
 
+import { type Recipe } from "./schemas";
+import {MOCK_RECIPE} from "./mock-recipe";
+
 export type State = {
-  errors?: {};
-  message?: string | null;
+  status: 'idle' | 'success' | 'error';
+  recipe?: Recipe;
+  message?: string;
 };
 
-// prevState contains the state passed from the useActionState hook. You won't be using it in the action in this example, but it's a required prop.
-export async function createRecipe(prevState: State, formData: FormData) {
-  try {
-    return {
-      errors: '',
-      message: '',
-    };
+export async function createRecipe(
+  prevState: State, 
+  formData: FormData
+): Promise<State> {
 
-  } catch(error){
-    console.error(error);
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+
     return {
-      message: ''
+      status: 'success',
+      recipe: MOCK_RECIPE,
     };
-  }
 }

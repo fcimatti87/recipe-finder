@@ -3,7 +3,7 @@
 
 import { useActionState } from 'react';
 import { 
-    State,
+    type State,
     createRecipe
 } from '@/app/lib/actions';
 import { 
@@ -13,9 +13,9 @@ import { MEAL_TYPE_LABELS } from '@/app/lib/labels';
 
 export default function RecipeForm() {
 
-  // : State è l'annotazione di tipo che dice a TypeScript che l'oggetto deve avere la forma del tipo State" (definito in actions.ts, con errors? e message?)
-  const initialState: State = { message: null, errors: {} };
-  const [state, formAction] = useActionState(createRecipe, initialState);
+  // : State è l'annotazione di tipo che dice a TypeScript che l'oggetto deve avere la forma del tipo State" (definito in actions.ts)
+  const initialState: State = { status: 'idle' };
+  const [state, formAction, isPending] = useActionState(createRecipe, initialState);
 
   return (
     <form 
@@ -74,8 +74,9 @@ export default function RecipeForm() {
       <div>
         <button 
           type="submit" 
-          className='rounded bg-zinc-600 px-4 py-2 text-white disabled:opacity-50'>
-          Crea la ricetta</button>
+          className='rounded bg-zinc-600 px-4 py-2 text-white disabled:opacity-50' disabled={isPending}>
+          {!isPending? 'Crea la ricetta' : 'Sto creando'} 
+          </button>
       </div>
     </form>
   );
