@@ -12,22 +12,22 @@ export const RecipeRequestSchema = z.object({
         .min(1, { error: 'Per favore inserisci almeno un ingrediente.'}) 
 });
 
+export const IngredientSchema = z.object({
+    name: z.string().min(1, {error: "Il nome dell'ingrediente è obbligatorio"}),
+    amount: z
+        .number()
+        .positive()
+        .nullable(), // nullable means q.b.,
+    unit: z.enum(['g', 'kg', 'ml', 'l', 'cucchiai', 'cucchiaini', 'q.b.', 'pz']),
+});
+
 // define a schema to validate the recipe AI response.
 export const RecipeSchema = z.object({
     title: z.string(),
     mealType: MealTypeSchema,
 
     // ingredienti
-    ingredients: z.array(
-        z.object({
-            name: z.string().min(1, {error: "Il nome dell'ingrediente è obbligatorio"}),
-            amount: z
-                .number()
-                .positive()
-                .nullable(), // nullable means q.b.,
-            unit: z.enum(['g', 'kg', 'ml', 'l', 'cucchiai', 'cucchiaini', 'q.b.', 'pezzi']),
-        })
-    ).min(1, {error: "La ricetta deve avere almeno un ingrediente"}),
+    ingredients: z.array(IngredientSchema).min(1, {error: "La ricetta deve avere almeno un ingrediente"}),
 
     // fasi
     instructions: z.array(z
@@ -51,6 +51,7 @@ export const RecipeSchema = z.object({
 export type RecipeRequest = z.infer<typeof RecipeRequestSchema>;
 export type Recipe = z.infer<typeof RecipeSchema>;
 export type MealType = z.infer<typeof MealTypeSchema>;
+export type Ingredient = z.infer<typeof IngredientSchema>;
 
 // Il tipo esiste solo mentre scrivi il codice, e TypeScript lo usa per controllarti.
 // Quando il progetto viene compilato, i tipi vengono cancellati: nel JavaScript che gira nel browser o sul server non ne resta traccia.

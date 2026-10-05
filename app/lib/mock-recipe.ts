@@ -5,9 +5,9 @@ export const MOCK_RECIPE: Recipe = {
     mealType: 'primo',
     ingredients: [
         { name: "spaghetti", amount: 320, unit: "g" },
-        { name: "aglio", amount: 2, unit: "pezzi" },
+        { name: "aglio", amount: 2, unit: "pz" },
         { name: "olio extravergine d'oliva", amount: 4, unit: "cucchiai" },
-        { name: "peperoncino", amount: 1, unit: "pezzi" },
+        { name: "peperoncino", amount: 1, unit: "pz" },
         { name: "prezzemolo", amount: null, unit: "q.b." },
         { name: "sale", amount: null, unit: "q.b." },
     ],
