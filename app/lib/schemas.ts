@@ -9,7 +9,7 @@ export const RecipeRequestSchema = z.object({
     ingredients: z
         .string()
         .trim()
-        .min(1, { error: 'Per favore inserisci almeno un ingrediente.'}) 
+        .min(1, { error: 'Per favore inserisci almeno un ingrediente.'}) // error to show if this check fails
 });
 
 export const IngredientSchema = z.object({
