@@ -3,9 +3,16 @@
 
 import { 
   type Recipe,
-  RecipeRequestSchema
+  RecipeRequestSchema,
+  RecipeSchema
  } from "./schemas";
 import { MOCK_RECIPE } from "./mock-recipe";
+import { generateText, Output } from 'ai';
+import { google } from '@ai-sdk/google';
+
+const MODEL_ID = "gemini-3.8-flash";
+const model = google(MODEL_ID);
+
 export type State = {
   status: 'idle' | 'success' | 'error';
   recipe?: Recipe;
@@ -34,10 +41,33 @@ export async function createRecipe(
 
   const { mealType, ingredients } = validatedFields.data;
 
-  await new Promise((resolve) => setTimeout(resolve, 1000));
+  let prompt;
+  if (mealType !== 'qualsiasi'){
+    prompt = 'Genera un ' + mealType;
+  } else {
+    prompt = 'Genera una ricetta';
+  }
 
-    return {
-      status: 'success',
-      recipe: MOCK_RECIPE,
-    };
+  console.log("API key loaded:", Boolean(process.env.GOOGLE_GENERATIVE_AI_API_KEY));
+  console.time("gemini");
+
+
+  // create models that call the Google Generative AI API using the provider instance (the first argument is the model id, e.g. gemini-3.8-flash)
+  // use Google language models to generate text with the generateText function
+  // use generateText function with Output.object() to generate structured data from a prompt
+  const { output } = await generateText({
+    model: model,
+    output: Output.object({
+      schema: RecipeSchema,
+    }),
+    prompt: prompt + ' con questi ingredienti: ' + ingredients
+  });
+
+  console.timeEnd("gemini");
+  
+  return {
+    status: 'success',
+    recipe: output,
+  };
+
 }

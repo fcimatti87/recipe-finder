@@ -29,7 +29,7 @@ export default function RecipeForm() {
             <label 
               htmlFor="mealType"
               className='block font-medium'>
-              Scegli un tipo di pasto
+              Scegli una tipologia di portata:
             </label>
             <div>
               <select
