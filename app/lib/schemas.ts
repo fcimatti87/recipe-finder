@@ -9,7 +9,8 @@ export const RecipeRequestSchema = z.object({
     ingredients: z
         .string()
         .trim()
-        .min(1, { error: 'Per favore inserisci almeno un ingrediente.'}) // error to show if this check fails
+        .min(1, { error: 'Per favore inserisci almeno un ingrediente'}) // error to show if this check fails
+        .regex(/[^,\s]/, { message: "L'input non può contenere solo virgole e spazi" })
 });
 
 export const IngredientSchema = z.object({
