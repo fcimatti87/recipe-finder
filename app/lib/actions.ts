@@ -4,17 +4,29 @@
 import { 
   type Recipe,
   RecipeRequestSchema,
-  RecipeSchema
+  RecipeResponseSchema
  } from "./schemas";
 // import { z } from 'zod';
 import { MOCK_RECIPE } from "./mock-recipe";
+import { MEAL_TYPE_LABELS } from "./labels";
 import { generateText, Output, APICallError, NoObjectGeneratedError } from 'ai'; // Vercel AI SDK core: provider-agnostic functions (text generation, structured output, errors)
 import { google } from '@ai-sdk/google';   // Google provider: connects the Vercel AI SDK core to the Gemini API (auth, request format)
 
 // create models that call the Google Generative AI API using the provider instance (the first argument is the model id, e.g. gemini-3.8-flash)
-const MODEL_ID = "gemini-3.8-flash";
+const MODEL_ID = process.env.GEMINI_MODEL ?? 'gemini-3.8-flash';
+
+// only to fast test
+// const MODEL_ID = process.env.GEMINI_MODEL ?? 'gemini-3.5-flash-lite';
+
 const AI_TIMEOUT_MS = 45_000;
 const model = google(MODEL_ID);
+const SYSTEM_PROMPT = `Comportati come un cuoco che crea ricette.
+  Regole:
+  - Scrivi tutta la ricetta in italiano.
+  - Il tempo di preparazione deve comprendere anche riposi, raffreddamenti e lievitazioni.
+  - Se un termine indica chiaramente un alimento, anche tramite un marchio, usalo, e nella ricetta scrivi il nome generico dell’alimento.
+  - Ignora le parole che nel loro significato comune non sono alimenti.
+  - Se non resta nessun alimento setta isPossible a false, setta recipe a null e scrivi in reason il motivo con un tono amichevole e in una frase sola.`;
 
 export type State = {
   status: 'idle' | 'success' | 'error';
@@ -23,7 +35,7 @@ export type State = {
 };
 
 export async function createRecipe(
-  prevState: State, 
+  _prevState: State, 
   formData: FormData
 ): Promise<State> {
 
@@ -44,20 +56,15 @@ export async function createRecipe(
 
   const { mealType, ingredients } = validatedFields.data;
 
-  let prompt;
-  if (mealType !== 'qualsiasi'){
-    prompt = 'Genera un ' + mealType;
-  } else {
-    prompt = 'Genera una ricetta';
-  }
-
   console.log("ingredients: " + ingredients);
   console.log("mealType: " + mealType);
-  // console.log(JSON.stringify(z.toJSONSchema(RecipeSchema), null, 2));
-
-  prompt = prompt + ' con questi ingredienti: ' + ingredients + ' . Considera che il tempo di preparazione deve comprendere anche riposi, raffreddamenti e lievitazioni.';
-
+  // console.log(JSON.stringify(z.toJSONSchema(RecipeResponseSchema), null, 2));
   console.log("API key loaded:", Boolean(process.env.GOOGLE_GENERATIVE_AI_API_KEY));
+
+  const prompt = 
+    mealType !== 'qualsiasi' 
+    ? `Genera un ${MEAL_TYPE_LABELS[mealType].toLowerCase()} usando questi ingredienti: ${ingredients}` 
+    : `Genera una ricetta usando questi ingredienti:  ${ingredients}`;
 
   console.time("gemini");
 
@@ -75,19 +82,30 @@ export async function createRecipe(
       },
       model: model,
       output: Output.object({
-        schema: RecipeSchema,
+        schema: RecipeResponseSchema,
       }),
+      system: SYSTEM_PROMPT,
       prompt: prompt,
       maxRetries: 0,
-      // abortSignal: AbortSignal.timeout(AI_TIMEOUT_MS) // the abort timeout to interrupt long waits
+      abortSignal: AbortSignal.timeout(AI_TIMEOUT_MS) // the abort timeout to interrupt long waits
     });
 
     console.log({usage, finishReason});
-    
-    return {
-      status: 'success',
-      recipe: output,
-    };
+
+    if (output.isPossible && output.recipe) {
+        // recipe generated with success
+      return {
+          status: 'success',
+          recipe: output.recipe,
+      };
+
+    } else {
+      // all ingredients are not valid or recipe is not generated
+      return {
+        status: 'error',
+        message: output.reason ?? 'Con questi ingredienti non riesco a creare una ricetta.'
+      };
+    }
 
   } catch(e){
     

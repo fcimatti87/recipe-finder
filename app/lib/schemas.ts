@@ -48,11 +48,19 @@ export const RecipeSchema = z.object({
     difficulty: z.enum(['facile', 'medio', 'difficile'])
 });
 
+// What the AI returns: a recipe, or the reason why none is possible.
+export const RecipeResponseSchema = z.object({
+    isPossible: z.boolean(),
+    reason: z.string(),
+    recipe: RecipeSchema.nullable()
+});
+
 // extract the inferred type
 export type RecipeRequest = z.infer<typeof RecipeRequestSchema>;
 export type Recipe = z.infer<typeof RecipeSchema>;
 export type MealType = z.infer<typeof MealTypeSchema>;
 export type Ingredient = z.infer<typeof IngredientSchema>;
+export type RecipeResponse = z.infer<typeof RecipeResponseSchema>;
 
 // Il tipo esiste solo mentre scrivi il codice, e TypeScript lo usa per controllarti.
 // Quando il progetto viene compilato, i tipi vengono cancellati: nel JavaScript che gira nel browser o sul server non ne resta traccia.
