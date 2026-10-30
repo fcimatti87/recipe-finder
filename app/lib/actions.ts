@@ -13,7 +13,7 @@ import { generateText, Output, APICallError, NoObjectGeneratedError } from 'ai';
 import { google } from '@ai-sdk/google';   // Google provider: connects the Vercel AI SDK core to the Gemini API (auth, request format)
 
 // create models that call the Google Generative AI API using the provider instance (the first argument is the model id, e.g. gemini-3.8-flash)
-const MODEL_ID = process.env.GEMINI_MODEL ?? 'gemini-3.8-flash';
+const MODEL_ID = process.env.GEMINI_MODEL ?? 'gemini-3.5-flash-lite';
 
 // only to fast test
 // const MODEL_ID = process.env.GEMINI_MODEL ?? 'gemini-3.5-flash-lite';
