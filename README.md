@@ -18,6 +18,10 @@ Next.js 16 · TypeScript · Tailwind CSS 4 · Zod 4 · Vercel AI SDK 7 · Gemini
 - For testing the larger model locally, set `GEMINI_MODEL=gemini-3.8-flash` in `.env.local`.
 - No streaming yet: the recipe appears only when it is complete. Planned for the next version.
 
+## How it was built
+About 21 hours of effective work, planned as GitHub issues with one branch and one pull request each. 
+Design decisions are recorded in `docs/decisions/`.
+
 ## Run locally
 ```bash
 pnpm install
