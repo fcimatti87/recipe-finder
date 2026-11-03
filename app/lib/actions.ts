@@ -3,6 +3,8 @@
 
 import { 
   type Recipe,
+  type Ingredient,
+  type MealType,
   RecipeRequestSchema,
   RecipeResponseSchema
  } from "./schemas";
@@ -15,21 +17,26 @@ import { google } from '@ai-sdk/google';   // Google provider: connects the Verc
 // create models that call the Google Generative AI API using the provider instance (the first argument is the model id, e.g. gemini-3.8-flash)
 const MODEL_ID = process.env.GEMINI_MODEL ?? 'gemini-3.5-flash-lite';
 
-// only to fast test
-// const MODEL_ID = process.env.GEMINI_MODEL ?? 'gemini-3.5-flash-lite';
-
 const AI_TIMEOUT_MS = 45_000;
 const model = google(MODEL_ID);
-const SYSTEM_PROMPT = `Comportati come un cuoco che crea ricette.
-  Regole:
-  - Scrivi tutta la ricetta in italiano.
-  - Il tempo di preparazione deve comprendere anche riposi, raffreddamenti e lievitazioni.
-  - Se un termine indica chiaramente un alimento, anche tramite un marchio, usalo, e nella ricetta scrivi il nome generico dell’alimento.
-  - Ignora le parole che nel loro significato comune non sono alimenti.
-  - Se non resta nessun alimento setta isPossible a false, setta recipe a null e scrivi in reason il motivo con un tono amichevole e in una frase sola.`;
+const SYSTEM_PROMPT = 
+`Regole per gli ingredienti:
+- Se un termine indica chiaramente un alimento, anche tramite un marchio, usalo, e nella ricetta scrivi il nome generico dell’alimento.
+- Ignora le parole che nel loro significato comune non sono alimenti.
+- Puoi aggiungere ingredienti da dispensa che si trovano in ogni casa.
+- Usa "pz" solo per ingredienti che si contano (uova, spicchi d'aglio, limoni); tutto il resto va in grammi o millilitri.
+- Esprimi il lievito in grammi (una bustina sono 16 g); spezie e aromi in cucchiaini o "q.b.".
+- Se non resta nessun alimento setta isPossible a false, setta recipe a null e scrivi in reason il motivo con un tono amichevole e in una frase sola.
+
+Regole per la ricetta:
+- Comportati come un cuoco esperto e proponi una ricetta gustosa, equilibrata e realistica.
+- Scrivi tutta la ricetta in italiano, con accenti e apostrofi corretti.
+- prepTimeMinutes è il tempo totale escluso la cottura principale: comprende cotture preliminari di eventuali ingredienti, riposi, raffreddamenti e lievitazioni.`;
 
 export type State = {
   status: 'idle' | 'success' | 'error';
+  mealType?: string;
+  ingredients?: string;
   recipe?: Recipe;
   message?: string;
 };
@@ -39,10 +46,12 @@ export async function createRecipe(
   formData: FormData
 ): Promise<State> {
 
-  const validatedFields = RecipeRequestSchema.safeParse({
-    mealType: formData.get('mealType'),
-    ingredients: formData.get('ingredients')
-  });
+  const fields = {
+    mealType: String(formData.get("mealType") ?? "qualsiasi"),
+    ingredients: String(formData.get("ingredients") ?? ""),
+  };
+
+  const validatedFields = RecipeRequestSchema.safeParse(fields);
   
   // If form validation fails, return errors early. Otherwise, continue.
   if (!validatedFields.success) {
@@ -51,6 +60,7 @@ export async function createRecipe(
     return {
       status: 'error',
       message: validatedFields.error.issues[0].message,
+      ...fields
     };
   }
 
@@ -76,7 +86,7 @@ export async function createRecipe(
       providerOptions: {
         google: {
             thinkingConfig: {
-              thinkingLevel: 'medium'
+              thinkingLevel: 'high'
             }
           }
       },
@@ -97,13 +107,15 @@ export async function createRecipe(
       return {
           status: 'success',
           recipe: output.recipe,
+          ...fields
       };
 
     } else {
       // all ingredients are not valid or recipe is not generated
       return {
         status: 'error',
-        message: output.reason ?? 'Con questi ingredienti non riesco a creare una ricetta.'
+        message: output.reason ?? 'Con questi ingredienti non riesco a creare una ricetta.',
+        ...fields
       };
     }
 
@@ -133,6 +145,7 @@ export async function createRecipe(
     return {
       status: 'error',
       message: message,
+      ...fields
     };
 
   } finally {
