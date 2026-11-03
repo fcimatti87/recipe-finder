@@ -35,7 +35,8 @@ export default function RecipeForm() {
               <select
                 id="mealType"
                 name="mealType"
-                defaultValue="qualsiasi"
+                key={state.mealType}
+                defaultValue={state.mealType ?? "qualsiasi"}
                 className='rounded border border-zinc-400 p-2'
               >
                 <option value="qualsiasi">Qualsiasi</option>
@@ -59,6 +60,7 @@ export default function RecipeForm() {
               <textarea
                   id="ingredients"
                   name="ingredients"
+                  defaultValue={state.ingredients}
                   aria-describedby='missing-ingredients-error'
                   className='w-full rounded border border-zinc-400 p-2'/>
             </div>
