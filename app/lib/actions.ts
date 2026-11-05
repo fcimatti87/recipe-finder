@@ -15,7 +15,7 @@ import { generateText, Output, APICallError, NoObjectGeneratedError } from 'ai';
 import { google } from '@ai-sdk/google';   // Google provider: connects the Vercel AI SDK core to the Gemini API (auth, request format)
 
 // create models that call the Google Generative AI API using the provider instance (the first argument is the model id, e.g. gemini-3.8-flash)
-const MODEL_ID = process.env.GEMINI_MODEL ?? 'gemini-3.5-flash-lite';
+const MODEL_ID = process.env.GEMINI_MODEL ?? 'gemini-3.1-flash-lite';
 
 const AI_TIMEOUT_MS = 45_000;
 const model = google(MODEL_ID);
@@ -96,7 +96,7 @@ export async function createRecipe(
       }),
       system: SYSTEM_PROMPT,
       prompt: prompt,
-      maxRetries: 0,
+      maxRetries: 2,
       abortSignal: AbortSignal.timeout(AI_TIMEOUT_MS) // the abort timeout to interrupt long waits
     });
 
