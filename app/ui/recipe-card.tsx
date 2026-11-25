@@ -30,8 +30,8 @@ export default function RecipeCard({ recipe } : {recipe: Recipe }) {
             </dl>
             <h3 className="mt-4 font-medium">Ingredienti:</h3>
             <ul className="list-disc pl-5">
-                {recipe.ingredients.map((ingr) => (
-                    <li key={ingr.name}>{formatIngredient(ingr)}</li>
+                {recipe.ingredients.map((ingr, idx) => (
+                    <li key={idx}>{formatIngredient(ingr)}</li>
                 ))}            
             </ul>
             <h3 className="mt-4 font-medium">Istruzioni:</h3>
