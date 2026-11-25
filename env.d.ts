@@ -3,5 +3,7 @@ declare namespace NodeJS {
   interface ProcessEnv {
     GOOGLE_GENERATIVE_AI_API_KEY?: string;
     GEMINI_MODEL?: string;
+    UPSTASH_REDIS_REST_URL?:string;
+    UPSTASH_REDIS_REST_TOKEN?: string;
   }
 }
