@@ -11,7 +11,7 @@ export default function Home() {
         Recipe Finder
       </h1>
       <p className="text-zinc-600 mt-2">
-        Dimmi cosa c'è nel tuo frigorifero e ti suggerirò una ricetta.
+        Dimmi cosa c’è nel tuo frigorifero e ti suggerirò una ricetta.
       </p>
       <RecipeForm/>
     </main>
