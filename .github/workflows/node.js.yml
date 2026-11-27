@@ -1,0 +1,34 @@
+# GitHub Actions provides you with a blank computer, uses it to execute the steps you’ve written, and then discards it. 
+# Each entry in the file specifies when to power it on, which computer to use, and what tasks to perform.
+
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+
+name: Node.js CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [24.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+    # uses: uses a pre-built action—written by others and published on GitHub—much like a library;
+    # run: executes a command in the terminal
+    - uses: actions/checkout@v4 # download PR branch
+    - uses: pnpm/setup@v3 # installs node, pnpm and the dependencies exactly like in the lockfile
+      with:
+        runtime: node@${{ matrix.node-version }}
+    - run: pnpm lint
+    - run: pnpm typecheck
+    - run: pnpm build
